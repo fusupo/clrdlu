@@ -306,46 +306,14 @@
     (println "Sorry, there is no room for" (:name @object)
              "on" (:name @support))))
 
-(defn put [o s]
-  (put-on (block_map o) (block_map s))
-  (draw))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (do (reset-world)
-;;     (println "------------------------->>")
-;;     (print (put-on w7 b3))
-;;     (println "------------------------->>")
-;;     (print (put-on b2 b4))
-;;     (println "------------------------->>")
-;;     (print (put-on w5 b2)))
-
-;; (pprint w7)
-;; (pprint "suckit")
-;; (pprint (assoc w7 :position '(999 999)))
-;; (print (* 8 8))
-
-;; (println (top-location @hh))
-;; (println (top-location @(second *blocks*)))
-;; (println (get-space @(second *blocks*)  @(nth *blocks* 3)))
-;; (println @(block_map "tt"))
-
-;; (println  (m/run* [q]
-;;             (membero q [1 2 3])
-;;             (membero q [2 3 4])))
-
-;;(print (put-on (block_map "b1") (block_map "b2")))
-
-;; (println "------------------------->>")
-;; (print (put-on (block_map "b2") (block_map "w7")))
-;; (println "------------------------->>")
-;; (print (put-on (block_map "b1") (block_map "b2")))
-;; (println "------------------------->>")
-;; (print (put-on (block_map "b2") (block_map "b6")))
-;; (println "------------------------->>")
-
-(println (:name @(:supported-by @(block_map "b1"))))
-
+(def black "#000000")
+(def yellow "#FFDB7F")
+(def red "#E88E7F")
+(def purple "#DA98FF")
+(def blue "#88BAE8")
+(def green "#7FFFA5")
 
 (def canvas (.getElementById js/document "canvas"))
 (def context (.getContext canvas "2d"))
@@ -356,26 +324,17 @@
 (def world (atom {}))
 
 (defn resized []
-  (set! (.-width canvas) (* @width cell-size)) ;;(.-innerWidth js/window))
-  (set! (.-height canvas) (* @height cell-size)) ;;(.-innerHeight js/window))
-  ;; (reset! width (/ (.-width canvas) cell-size))
-  ;; (reset! height (/ (.-height canvas) cell-size))
-  )
+  (set! (.-width canvas) (* @width cell-size))
+  (set! (.-height canvas) (* @height cell-size)))
 
 (defn fill_sq [x y w h];; colour]
   (set! (.-fillStyle context) red)
   (set! (.-strokeStyle context) yellow)
-  ;; (.fillRect context
-  ;;            (* x cell-size)
-  ;;            (* y cell-size)
-  ;;            (* w cell-size)
-  ;;            (* h cell-size))
   (.strokeRect context
                (* x cell-size)
                (* y cell-size)
                (* w cell-size)
-               (* h cell-size))
-  )
+               (* h cell-size)))
 
 (defn fill_tri [x y w h];; colour]
   (set! (.-fillStyle context) red)
@@ -391,7 +350,7 @@
     (.lineTo context tx ty)
     (.stroke context)))
 
-(defn fill_circ [x y w h];; colour]
+(defn fill_circ [x y w];; colour]
   (set! (.-fillStyle context) red)
   (set! (.-strokeStyle context) yellow)
   (let [r (/ (* cell-size w) 2)
@@ -409,13 +368,6 @@
 (defn deg->rad [d]
   (* Math/PI (/ d 360)))
 
-(def black "#000000")
-(def yellow "#FFDB7F")
-(def red "#E88E7F")
-(def purple "#DA98FF")
-(def blue "#88BAE8")
-(def green "#7FFFA5")
-
 (set! (.-onresize js/window) resized)
 
 (resized)
@@ -428,33 +380,26 @@
              (* cell-size @width)
              (* cell-size @height)))
 
-;;(blank)
-
 (defn draw []
   (blank)
   (doseq [[k v] block_map]
-    (cond
-      (= (:type @v) ::brick)(fill_sq (first (:position @v))
-                                     (- @height (last (:position @v)))
-                                     (:width @v)
-                                     (- (:height @v)))
-      (= (:type @v) ::wedge)(fill_tri (first (:position @v))
-                                      (- @height (last (:position @v)))
-                                      (:width @v)
-                                      (- (:height @v)))
-      (= (:type @v) ::ball)(fill_circ (first (:position @v))
-                                      (- @height (last (:position @v)))
-                                      (:width @v)
-                                      (- (:height @v)))
-      :else
-      (println "table"))
+    (let [x (first (:position @v))
+          y (- @height (last (:position @v)))
+          w (:width @v)
+          h (- (:height @v))]
+      (cond
+        (= (:type @v) ::brick)(fill_sq x y w h)
+        (= (:type @v) ::wedge)(fill_tri x y w h)
+        (= (:type @v) ::ball)(fill_circ x y w)
+        :else
+        (println "draw table")))
     (fill_txt (first (:position @v))
               (- @height (last (:position @v)))
               (:name @v))))
 
 (draw)
 
+(defn put [o s]
+  (put-on (block_map o) (block_map s))
+  (draw))
 
-(println (- 6))
-
-(println Math/PI)
