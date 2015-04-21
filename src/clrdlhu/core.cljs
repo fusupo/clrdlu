@@ -55,23 +55,10 @@
     (if (not= v tt)
       (do
         (make-def "tt" (update-in @tt [:support-for] (fn [x y] (cons y x)) v))
-        (make-def k (update-in @v [:supported-by] (fn [x y] y) tt)))))
-  
-  ;; (doseq [l *blocks*]
-  ;;   (let [n (:name l)]
-  ;;     (make-def n l)))
-  
-  ;; (doseq [l (rest *blocks*)
-  ;;         :let [tt (first *blocks*)]]
+        (make-def k (update-in @v [:supported-by] (fn [x y] y) tt))))))
 
-  ;;   ;; (make-def (:name tt))
-  ;;   (reset! tt (update-in @tt [:support-for] (fn [x y] (cons y x)) l))
-  ;;   ;; (make-def (:name l))
-  ;;   (reset! l (update-in @l [:supported-by] (fn [x y] y) tt))
-  ;;   )
-  )
 (reset-world)
-;;(println (block_map "b2"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -101,12 +88,9 @@
     (list (+ posx  (/ w 2)) (+ posy h))))
 
 (defn intersections-p [object offset base obstacles]
-  ;;(println "----+++")
-  ;;(println "Ip, " (:name @object) offset base);; obstacles)
   (let [hit nil]
     (loop [obstacle obstacles
            hit nil]
-      ;;(println (or (empty? obstacle) (= true hit)))
       (if (or (empty? obstacle) (= true hit))
         hit
         (let [o (first obstacle)
@@ -114,12 +98,6 @@
               rs-proposed (+ ls-proposed (:width @object))
               ls-obstacle (first (:position @o))
               rs-obstacle (+ ls-obstacle (:width @o))]
-
-          ;; (println (count obstacle) "-->"
-          ;;          (:name @object) ls-proposed rs-proposed
-          ;;          (:name @o) ls-obstacle rs-obstacle
-          ;;          (or (>= ls-proposed rs-obstacle) (<= rs-proposed ls-obstacle)))
-
           (if (or (>= ls-proposed rs-obstacle)
                  (<= rs-proposed ls-obstacle))
             (recur (next obstacle) hit)
@@ -133,11 +111,6 @@
          max-offset (+ 1 (- (:width @support)
                             (:width @object)))
          hit nil]
-
-    ;; (println "-->" (intersections-p object curr-offset
-    ;;                                 (first (:position @support))
-    ;;                                 (:support-for @support)))
-    
     (cond (or (= curr-offset max-offset) (not= nil hit)) hit
           :else (if (not (intersections-p object curr-offset
                                         (first (:position @support))
