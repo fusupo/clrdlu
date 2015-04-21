@@ -351,60 +351,60 @@
 (def context (.getContext canvas "2d"))
 
 (def width (atom 20))
-(def height (atom 6))
+(def height (atom 10))
 (def cell-size 25)
 (def world (atom {}))
 
 (defn resized []
-  (set! (.-width canvas) (* 20 cell-size)) ;;(.-innerWidth js/window))
-  (set! (.-height canvas) (* 6 cell-size)) ;;(.-innerHeight js/window))
+  (set! (.-width canvas) (* @width cell-size)) ;;(.-innerWidth js/window))
+  (set! (.-height canvas) (* @height cell-size)) ;;(.-innerHeight js/window))
   ;; (reset! width (/ (.-width canvas) cell-size))
   ;; (reset! height (/ (.-height canvas) cell-size))
   )
 
 (defn fill_sq [x y w h];; colour]
   (set! (.-fillStyle context) red)
-  (set! (.-strokeStyle context) black)
-  (.fillRect context
-             (* x cell-size)
-             (* y cell-size)
-             (* w cell-size)
-             (* h cell-size))
+  (set! (.-strokeStyle context) yellow)
+  ;; (.fillRect context
+  ;;            (* x cell-size)
+  ;;            (* y cell-size)
+  ;;            (* w cell-size)
+  ;;            (* h cell-size))
   (.strokeRect context
                (* x cell-size)
                (* y cell-size)
                (* w cell-size)
-               (* h cell-size)))
+               (* h cell-size))
+  )
 
 (defn fill_tri [x y w h];; colour]
   (set! (.-fillStyle context) red)
-  (set! (.-strokeStyle context) black)
-  (.fillRect context
-             (* x cell-size)
-             (* y cell-size)
-             (* w cell-size)
-             (* h cell-size))
-  (.strokeRect context
-               (* x cell-size)
-               (* y cell-size)
-               (* w cell-size)
-               (* h cell-size)))
+  (set! (.-strokeStyle context) yellow)
+  (let [tx (* cell-size x)
+        ty (* cell-size y)
+        tw (* cell-size w)
+        th (* cell-size h)]
+    (.beginPath context)
+    (.moveTo context tx ty)
+    (.lineTo context (+ tx tw) ty)
+    (.lineTo context (+ tx (/ tw 2)) (+ ty th))
+    (.lineTo context tx ty)
+    (.stroke context)))
 
 (defn fill_circ [x y w h];; colour]
   (set! (.-fillStyle context) red)
-  (set! (.-strokeStyle context) black)
-  (.fillRect context
-             (* x cell-size)
-             (* y cell-size)
-             (* w cell-size)
-             (* h cell-size))
-  (.strokeRect context
-               (* x cell-size)
-               (* y cell-size)
-               (* w cell-size)
-               (* h cell-size)))
+  (set! (.-strokeStyle context) yellow)
+  (let [r (/ (* cell-size w) 2)
+        tx (+ r (* cell-size x))
+        ty (- (* cell-size y) r)]
+    (.beginPath context)
+    (.arc context tx ty r 0 (* Math/PI 2) true)
+    (.stroke context)))
 
-
+(defn fill_txt [x y str]
+  (set! (.-fillStyle context) yellow)
+  (set! (.-font context) "10px sans-serif")
+  (.fillText context str (+ 15 (* cell-size x)) (- (* cell-size y) 5)))
 
 (defn deg->rad [d]
   (* Math/PI (/ d 360)))
@@ -447,9 +447,14 @@
                                       (:width @v)
                                       (- (:height @v)))
       :else
-      (println "table"))))
+      (println "table"))
+    (fill_txt (first (:position @v))
+              (- @height (last (:position @v)))
+              (:name @v))))
 
 (draw)
 
 
 (println (- 6))
+
+(println Math/PI)
