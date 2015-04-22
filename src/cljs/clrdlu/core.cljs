@@ -1,9 +1,19 @@
-(ns clrdlhu.core
-  (:require [clojure.browser.repl :as repl]
-            [monet.canvas :as canvas]
-            [cljs.core.logic :as m :refer [membero]]))
+(ns clrdlu.core
+  (:require [om.core :as om :include-macros true]
+            [om.dom :as dom :include-macros true]))
 
-;; (repl/connect "http://localhost:9000/repl")
+(defonce app-state (atom {:text "Hello Chestnut!"}))
+
+(defn main []
+  (om/root
+    (fn [app owner]
+      (reify
+        om/IRender
+        (render [_]
+          (dom/h1 nil (:text app)))))
+    app-state
+    {:target (. js/document (getElementById "app"))}))
+
 
 (enable-console-print!)
 
@@ -375,4 +385,3 @@
 (defn put [o s]
   (put-on (block_map o) (block_map s))
   (draw))
-
